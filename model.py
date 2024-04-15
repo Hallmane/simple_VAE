@@ -30,8 +30,8 @@ class VariationalAutoEncoder(nn.Module):
 
     def forward(self, x):
         mu, sigma = self.encode(x)
-        epsilon = torch.randn_like(sigma)
-        z_reparametrized = mu + sigma*epsilon # it's gaussian
+        epsilon = torch.randn_like(sigma) # sample a value from the normal distribution
+        z_reparametrized = mu + sigma*epsilon # turn the pair of 20D vectors into distributions (gaussians)
         x_hat = self.decode(z_reparametrized)
         return x_hat, mu, sigma
 
