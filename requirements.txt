@@ -1,0 +1,6 @@
+librosa
+torch
+scipy
+numba
+msgpack
+pickle

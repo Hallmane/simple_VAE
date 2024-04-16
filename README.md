@@ -7,7 +7,11 @@ using mnist 28x28 images to begin with
 
 ## TODO
 * Build a sound generating VAE with this video 'https://www.youtube.com/watch?v=fWSoEqWNh8w'
+[] - spectrograms from mp3 files
 * RAVE paper `https://arxiv.org/pdf/2111.05011.pdf`
+* interpolating - do it in polar coordinates due to working with gaussians (slerp)
+
+* https://github.com/moiseshorta/MelSpecVAE/blob/main/vae.py
 
 
 # RAVE model

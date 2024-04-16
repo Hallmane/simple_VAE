@@ -7,6 +7,9 @@ from torchvision import transforms # augmentations
 from torchvision.utils import save_image
 from torch.utils.data import DataLoader
 
+import os
+import numpy as np
+
 # config
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 INPUT_DIM = 784
@@ -22,7 +25,8 @@ beta = 1
 
 
 # dataset stuff
-dataset = datasets.MNIST(root="dataset/", train=True, transform=transforms.ToTensor(), download=True)
+#dataset = datasets.MNIST(root="dataset/", train=True, transform=transforms.ToTensor(), download=True)
+#dataset = datasets.MNIST(root="dataset/", train=True, transform=transforms.ToTensor(), download=True)
 train_loader = DataLoader(dataset=dataset, batch_size=BATCH_SIZE, shuffle=True)
 
 # model, optim and loss
@@ -30,57 +34,14 @@ model = VariationalAutoEncoder(INPUT_DIM, H_DIM, Z_DIM).to(DEVICE)
 optimizer = optim.Adam(model.parameters(), lr=LR)
 loss_fn = nn.BCELoss(reduction="sum")
 
-# traning loop
-for epoch in range(NUM_EPOCHS):
-    loop = tqdm(enumerate(train_loader))
-    for i, (x, _) in loop:
-        # forward pass
-        x = x.to(DEVICE).view(x.shape[0], INPUT_DIM) # reshape makes a copy, so view is used?
-        x_hat, mu, sigma = model(x)
 
-        # compute loss
-        reconstruction_loss = loss_fn(x_hat, x) # pushing it towards a std gaussian
-        kl_div = -torch.sum(1 + torch.log(sigma.pow(2)) - mu.pow(2) - sigma.pow(2)) # ?
+def load_spectrograms():
+    x_train = []
+    for root, _, files in os.walk.('./dataset/spectrograms/'):
+        for file in files:
+            file_path = os.path.join(root, file)
+            spectrograms = np.load(file_path)
+            x_train.append(spectrograms)
 
-        # backpropagation
-        loss = alpha*reconstruction_loss + beta*kl_div
-        optimizer.zero_grad()
-        loss.backward()
-        optimizer.step()
-        loop.set_postfix(loss=loss.item())
-
-
-model = model.to("cpu")
-def inference(digit, num_examples=1):
-    """  bla  """
-    images = []
-    idx = 0
-    for x, y in dataset: 
-        if y == idx:
-            images.append(x)
-            idx += 1
-        if idx == 10:
-            break
-    
-    encodings_digit = []
-    for d in range(10):
-        with torch.no_grad():
-            mu, sigma = model.encode(images[d].view(1, 784)) # get mu and sigma from model
-        encodings_digit.append((mu, sigma)) # store them with their digit
-
-    mu, sigma = encodings_digit[digit] 
-    for example in range(num_examples):
-        epsilon = torch.randn_like(sigma)
-        z = mu + sigma*epsilon # reparameterize
-        y = model.decode(z)
-        y = y.view(-1, 1, 28, 28)
-        save_image(y, f"generated_vae_{digit}_mnist_{example}.png")
-
-for idx in range(10):
-    inference(idx, num_examples=5) 
-        
-
-
-
-
+    return x_train
 
