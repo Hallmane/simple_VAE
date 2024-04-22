@@ -141,7 +141,7 @@ class Preprocessor:
 if __name__ == "__main__":
     FRAME_SIZE = 512
     HOP_LENGTH = 256
-    DURATION = 3 # experiment with this 
+    DURATION = 2.97 # experiment with this 
     SR = 22050
     MONO = True
 

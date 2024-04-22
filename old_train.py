@@ -39,11 +39,11 @@ for epoch in range(NUM_EPOCHS):
         x_hat, mu, sigma = model(x)
 
         # compute loss
-        reconstruction_loss = loss_fn(x_hat, x) # pushing it towards a std gaussian
-        kl_div = -torch.sum(1 + torch.log(sigma.pow(2)) - mu.pow(2) - sigma.pow(2)) # ?
+        reconstruction_loss = loss_fn(x_hat, x)  # standard input/output loss
+        kl_div = -torch.sum(1 + torch.log(sigma.pow(2)) - mu.pow(2) - sigma.pow(2)) # pushing the individual distributions towards a standard gaussian 
 
         # backpropagation
-        loss = alpha*reconstruction_loss + beta*kl_div
+        loss = alpha*reconstruction_loss + beta*kl_div # combined loss creating the continuous latent space ball
         optimizer.zero_grad()
         loss.backward()
         optimizer.step()
